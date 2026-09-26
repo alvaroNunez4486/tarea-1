@@ -64,3 +64,50 @@ int leerBotonConDebounce() {
     }
   }
 }
+
+// SECUENCIA DE PERDIDA (GAME OVER)
+void juegoTerminado() {
+  tone(BUZZER_PIN, 150, 600);
+  
+  for (int i = 0; i < 3; i++) {
+    for (byte j = 0; j < 3; j++) {
+      digitalWrite(LED_PINS[j], HIGH);
+    }
+    delay(150);
+    for (byte j = 0; j < 3; j++) {
+      digitalWrite(LED_PINS[j], LOW);
+    }
+    delay(150);
+  }
+  
+  nivelActual = 0; // Reinicia el nivel
+  delay(1000);
+}
+
+
+// BUCLE PRINCIPAL DEL JUEGO
+void loop() {
+  // 1. Agregar nuevo paso aleatorio a la secuencia
+  secuencia[nivelActual] = random(0, 3);
+  nivelActual++;
+
+  delay(500);
+
+  // 2. Mostrar la secuencia acumulada al usuario
+  reproducirSecuencia();
+
+  // 3. Esperar y verificar las entradas del usuario
+  for (int i = 0; i < nivelActual; i++) {
+    int botonPresionado = leerBotonConDebounce();
+
+    if (botonPresionado != secuencia[i]) {
+      juegoTerminado();
+      return;
+    }
+  }
+
+  // 4. Sonido de éxito al completar el nivel
+  tone(BUZZER_PIN, 523, 150); delay(150);
+  tone(BUZZER_PIN, 784, 300); delay(300);
+  delay(500);
+}
