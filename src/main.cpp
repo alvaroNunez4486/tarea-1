@@ -27,6 +27,40 @@ void setup() {
   randomSeed(analogRead(A0));
 }
 
-void loop() {
-  // Se completará en los siguientes commits
+// FUNCIONES AUXILIARES DE SONIDO Y LUZ
+void encenderElemento(byte indice, int duracion) {
+  digitalWrite(LED_PINS[indice], HIGH);
+  tone(BUZZER_PIN, TONOS[indice]);
+  delay(duracion);
+  digitalWrite(LED_PINS[indice], LOW);
+  noTone(BUZZER_PIN);
+}
+
+void reproducirSecuencia() {
+  for (int i = 0; i < nivelActual; i++) {
+    encenderElemento(secuencia[i], 400);
+    delay(200);
+  }
+}
+
+// LECTURA DE BOTONES CON ANTIRREBOTE (DEBOUNCE)
+int leerBotonConDebounce() {
+  while (true) {
+    for (byte i = 0; i < 3; i++) {
+      // El botón presionado manda una señal LOW al estar en PULLUP
+      if (digitalRead(BUTTON_PINS[i]) == LOW) {
+        delay(50); // Tiempo de espera antirrebote
+        
+        if (digitalRead(BUTTON_PINS[i]) == LOW) {
+          encenderElemento(i, 300);
+          
+          // Esperar a que el usuario suelte el botón
+          while (digitalRead(BUTTON_PINS[i]) == LOW);
+          delay(50);
+          
+          return i; // Devuelve el índice del botón presionado
+        }
+      }
+    }
+  }
 }
